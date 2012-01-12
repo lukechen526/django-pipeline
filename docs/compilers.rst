@@ -88,6 +88,36 @@ To use it add this to your ``PIPELINE_COMPILERS`` ::
   Defaults to ``''``.
 
 
+Stylus compiler
+===============
+
+The Stylus compiler use `Stylus <http://learnboost.github.com/stylus/>`
+to compile your stylesheets.
+
+To use it add this to your ``PIPELINE_COMPILERS`` ::
+
+  PIPELINE_COMPILERS = (
+      'pipeline.compilers.stylus.StylusCompiler',
+  )
+
+
+``PIPELINE_STYLUS_BINARY``
+--------------------------
+
+  Command line to execute for stylus program.
+  You will most likely change this to the location of stylus on your system.
+ 
+  Defaults to ``'/usr/local/bin/stylus'``.
+
+``PIPELINE_STYLUS_ARGUMENTS``
+-----------------------------
+
+  Additional arguments to use when stylus is called.
+  
+  Defaults to ``''``.
+
+
+
 Write your own compiler class
 =============================
 
@@ -112,6 +142,6 @@ A custom compiler for a imaginary compiler called jam ::
     def match_file(self, filename):
       return path.endswith('.jam')
     
-    def compile_file(self, content):
+    def compile_file(self, content, path):
       return jam.compile(content)
 

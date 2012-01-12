@@ -100,6 +100,16 @@ Group options
   For CSS, if you do not specify ``extra_context``/``media``, the default media in
   the ``<link>`` output will be ``media="all"``.
 
+``absolute_asset_paths``
+........................
+
+  **Optional**
+
+  Indicates if relative paths in CSS files should be made absolute, based on
+  ``PIPELINE_URL``. This only applies to entries in ``PIPELINE_CSS``.
+
+  Defaults to ``True``.
+
 .. note::
 
   Note that all filenames are specified relative to ``PIPELINE_ROOT``, and thus the source
@@ -174,6 +184,8 @@ Other settings
 ............................
 
   Compressor class to be applied to CSS files.
+
+  If empty or ``None``, CSS files won't be compressed.
   
   Defaults to ``'pipeline.compressors.yui.YUICompressor'``.
 
@@ -181,6 +193,8 @@ Other settings
 ...........................
 
   Compressor class to be applied to JavaScript files.
+
+  If empty or ``None``, JavaScript files won't be compressed.
   
   Defaults to ``'pipeline.compressors.yui.YUICompressor'``
 
@@ -253,7 +267,8 @@ Rewriting CSS urls
 ==================
 
 If source CSS contain a relative URL (i.e. relative to current file),
-those URL will be converted to full relative path using ``PIPELINE_URL``.
+and ``absolute_asset_paths`` is set to ``True`` or left out in the package
+entry, the URL will be converted to full relative path using ``PIPELINE_URL``.
 This conversion is performed before any compressors are applied ::
 
   media/js/fancybox/
@@ -281,6 +296,10 @@ In resulting CSS it will be rewritten to ::
 
 External urls
 =============
+
+.. warning::
+
+    This feature is currently deprecated and will be remove in next major version of pipeline.
 
 While Pipeline does a great job of minimizing the amount of http requests
 on your site (hence increasing performance) there are sometimes cases when you

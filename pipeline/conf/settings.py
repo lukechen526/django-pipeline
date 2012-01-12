@@ -2,9 +2,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 
-PIPELINE_ROOT = getattr(settings, 'PIPELINE_ROOT', settings.MEDIA_ROOT)
-PIPELINE_URL = getattr(settings, 'PIPELINE_URL', settings.MEDIA_URL)
-
 PIPELINE = getattr(settings, 'PIPELINE', not settings.DEBUG)
 PIPELINE_ROOT = getattr(settings, 'PIPELINE_ROOT', settings.STATIC_ROOT)
 PIPELINE_URL = getattr(settings, 'PIPELINE_URL', settings.STATIC_URL)
@@ -54,8 +51,11 @@ PIPELINE_COFFEE_SCRIPT_ARGUMENTS = getattr(settings, 'PIPELINE_COFFEE_SCRIPT_ARG
 PIPELINE_SASS_BINARY = getattr(settings, 'PIPELINE_SASS_BINARY', '/usr/local/bin/sass')
 PIPELINE_SASS_ARGUMENTS = getattr(settings, 'PIPELINE_SASS_ARGUMENTS', '')
 
+PIPELINE_STYLUS_BINARY = getattr(settings, 'PIPELINE_STYLUS_BINARY', '/usr/local/bin/stylus')
+PIPELINE_STYLUS_ARGUMENTS = getattr(settings, 'PIPELINE_STYLUS_ARGUMENTS', '')
+
 PIPELINE_LESS_BINARY = getattr(settings, 'PIPELINE_LESS_BINARY', '/usr/local/bin/lessc')
-PIPELINE_LESS_ARGUMENTS = getattr(settings, 'PIPELINE_LESS_ARGUMENTS', '-x')
+PIPELINE_LESS_ARGUMENTS = getattr(settings, 'PIPELINE_LESS_ARGUMENTS', '')
 
 if PIPELINE_COMPILERS is None:
     PIPELINE_COMPILERS = []

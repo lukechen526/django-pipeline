@@ -1,6 +1,98 @@
 Changelog
 =========
 
+1.1.26
+------
+
+* Fix unicode issue. Thanks to Adam Charnock.
+
+1.1.25
+------
+
+* Add stylus compiler. Thanks to David Charbonnier.
+* Fix git versioning. Thanks to David Charbonnier again.
+* Allow to disable asset normalization. Thansk to Christian Hammond.
+
+1.1.24
+------
+
+* Add deprecation warning on external urls
+* Fix windows paths support.
+* Don't try to pack externals package. Thanks to Cristian Andreica for the report.
+
+
+1.1.23
+------
+
+* Improve compressors documentation.
+* Allow to have no compressors. Thanks to Christian Hammond.
+* Fix less compiler to support @import. Thanks to TK Kocheran.
+
+1.1.22
+------
+
+* Fix google closure compiler verbose mode. Thanks to cgreene.
+* Fix absolute_path generation. Thanks to cgreene and Chris Northwood. 
+
+1.1.21
+------
+
+* Fix js template name generation when there is only one template. Thanks to Gerrdo Curiel for the report. 
+
+1.1.20
+------
+
+* Fix less and sass compilers.
+* Properly overwrite compiled file if it already exists. 
+
+1.1.19
+------
+
+* Add python 2.5 support.
+* Remove lessc default arguments.
+
+1.1.18.1
+--------
+
+* Ensure we don't break for font-face hack and other esoteric CSS urls.
+
+1.1.18
+------
+
+* Ensure we don't break font-face urls.
+
+1.1.17
+------
+
+* Don't use verbose where it's not supported or source of error.
+* Improve syncompress cache bsuting ability.
+
+1.1.16
+------
+
+* Add a way to compress specific groups with ``synccompress`` command.
+
+1.1.15.2
+--------
+
+* Fixing typo.
+
+1.1.15
+------
+
+* Allow synccompress to only update version cache.
+
+1.1.14.1
+--------
+
+* Fix bug when calculating relative_path.
+
+1.1.14
+------
+
+* Ensure javascript templates code get compiled properly. 
+* Use os.path.relpath() instead of the more error-prone string.replace() to find the relative path. Thanks to Luke Yu-Po Chen.
+
 1.1.13
 ------
 

@@ -2,6 +2,7 @@ import os
 import urlparse
 
 from django.core.files.base import ContentFile
+from django.utils.encoding import smart_str
 
 from pipeline.conf import settings
 from pipeline.compilers import Compiler
@@ -9,14 +10,13 @@ from pipeline.compressors import Compressor
 from pipeline.glob import glob
 from pipeline.signals import css_compressed, js_compressed
 from pipeline.storage import storage
+from pipeline.utils import filepath_to_uri
 from pipeline.versioning import Versioning
 
 
 class Packager(object):
-    def __init__(self, force=False, sync=False, verbose=False, css_packages=None, js_packages=None):
-        self.force = force
+    def __init__(self, verbose=False, css_packages=None, js_packages=None):
         self.verbose = verbose
-        self.sync = sync
         self.compressor = Compressor(verbose)
         self.versioning = Versioning(verbose)
         self.compiler = Compiler(verbose)
@@ -40,49 +40,53 @@ class Packager(object):
             )
 
     def individual_url(self, filename):
+        relative_path = self.compressor.relative_path(filename)[1:]
         return urlparse.urljoin(settings.PIPELINE_URL,
-            self.compressor.relative_path(filename)[1:])
+            filepath_to_uri(relative_path))
 
-    def pack_stylesheets(self, package):
+    def pack_stylesheets(self, package, **kwargs):
         variant = package.get('variant', None)
+        absolute_asset_paths = package.get('absolute_asset_paths', True)
         return self.pack(package, self.compressor.compress_css, css_compressed,
-            variant=variant)
+            variant=variant, absolute_asset_paths=absolute_asset_paths,
+            **kwargs)
 
     def compile(self, paths):
         return self.compiler.compile(paths)
 
-    def pack(self, package, compress, signal, **kwargs):
-        if settings.PIPELINE_AUTO or self.force or self.sync:
+    def pack(self, package, compress, signal, sync=False, force=False, **kwargs):
+        if settings.PIPELINE_AUTO or (force and sync):
             need_update, version = self.versioning.need_update(
                 package['output'], package['paths'])
-            if need_update or self.force:
+            if need_update or force:
                 output_filename = self.versioning.output_filename(
                     package['output'],
                     version
                 )
                 self.versioning.cleanup(package['output'])
-                if self.verbose or self.force:
+                if self.verbose:
                     print "Version: %s" % version
                     print "Saving: %s" % output_filename
                 paths = self.compile(package['paths'])
                 content = compress(paths,
                     asset_url=self.individual_url(output_filename), **kwargs)
                 self.save_file(output_filename, content)
-                signal.send(sender=self, package=package, version=version)
         else:
             filename_base, filename = os.path.split(package['output'])
-            version = self.versioning.version_from_file(filename_base, filename)
+            version = self.versioning.version_from_file(filename_base, filename, force=force)
+        signal.send(sender=self, package=package, version=version, **kwargs)
         return self.versioning.output_filename(package['output'], version)
 
-    def pack_javascripts(self, package):
-        return self.pack(package, self.compressor.compress_js, js_compressed, templates=package['templates'])
+    def pack_javascripts(self, package, **kwargs):
+        if 'externals' in package:
+            return
+        return self.pack(package, self.compressor.compress_js, js_compressed, templates=package['templates'], **kwargs)
 
     def pack_templates(self, package):
         return self.compressor.compile_templates(package['templates'])
 
     def save_file(self, path, content):
-        storage.save(path, ContentFile(content))
-        return path
+        return storage.save(path, ContentFile(smart_str(content)))
 
     def create_packages(self, config):
         packages = {}
@@ -103,6 +107,9 @@ class Packager(object):
             packages[name]['output'] = config[name]['output_filename']
             packages[name]['context'] = {}
             packages[name]['manifest'] = True
+            if 'absolute_asset_paths' in config[name]:
+                packages[name]['absolute_asset_paths'] = \
+                    config[name]['absolute_asset_paths']
             if 'extra_context' in config[name]:
                 packages[name]['context'] = config[name]['extra_context']
             if 'template_name' in config[name]:
